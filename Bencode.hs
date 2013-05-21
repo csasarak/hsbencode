@@ -1,16 +1,25 @@
 -- Author: Christopher Sasarak
 -- Filename: bencode.hs
 
+
+-- This is an implementation of Bencoding for bittorrent as described at 
+-- http://www.bittorrent.org/beps/bep_0003.html
+
 module Bencode where
 
 import Text.ParserCombinators.Parsec
+import qualified Data.Map as M
 
+-- Technically this first argument can only be a Bstr, but I don't know
+-- how to express that
+type BMapT = M.Map Bencode Bencode
+
+-- Maybe I should use a type variable?
 data Bencode =  Bint Integer
               | Bstr String
               | Blist [Bencode]
-              deriving (Show)
-
-
+              | Bmap BMapT
+              deriving (Show, Eq, Ord)
 
 
 -- Parse a Bencoded Integer
@@ -35,11 +44,11 @@ bList = do char 'l'
  
 -- A parser which parses dictionaries TODO: Make it so it does more than just
 -- recognize
-bDict :: Parser ()
+bDict :: Parser Bencode
 bDict = do char 'd'
            entries <- many dictEntry
            char 'e'
-           return ()
+           return $ Bmap $ M.fromList entries
 
 -- This parser will parse a key-value pair
 dictEntry :: Parser (Bencode, Bencode)
