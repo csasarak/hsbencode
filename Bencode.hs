@@ -32,4 +32,13 @@ bList = do char 'l'
            ls <- many (bInt <|> bString <|> bList)
            char 'e'
            return $ Blist ls
+ 
+-- A parser which parses dictionaries
+--bDict :: Parser ()
+--bDic
 
+-- This parser will parse a key-value pair
+dictEntry :: Parser (Bencode, Bencode)
+dictEntry = do key <- bString
+               value <- (bString <|> bList <|> bInt) -- TODO: Add bDict
+               return (key, value)
