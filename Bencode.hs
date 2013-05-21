@@ -33,9 +33,13 @@ bList = do char 'l'
            char 'e'
            return $ Blist ls
  
--- A parser which parses dictionaries
---bDict :: Parser ()
---bDic
+-- A parser which parses dictionaries TODO: Make it so it does more than just
+-- recognize
+bDict :: Parser ()
+bDict = do char 'd'
+           entries <- many dictEntry
+           char 'e'
+           return ()
 
 -- This parser will parse a key-value pair
 dictEntry :: Parser (Bencode, Bencode)
