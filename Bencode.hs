@@ -3,4 +3,11 @@
 
 module Bencode where
 
+import Text.ParserCombinators.Parsec
 
+-- Parse a Bencoded Integer
+integer :: Parser Integer
+integer = do char 'i'
+             ds <- many1 digit
+             char 'e'
+             return $ read ds 
