@@ -38,12 +38,11 @@ bString = do ss <- many1 digit
              
 bList :: Parser Bencode
 bList = do char 'l' 
-           ls <- many (bInt <|> bString <|> bList)
+           ls <- many (bInt <|> bString <|> bList <|> bDict)
            char 'e'
            return $ Blist ls
  
--- A parser which parses dictionaries TODO: Make it so it does more than just
--- recognize
+-- A parser which parses dictionaries 
 bDict :: Parser Bencode
 bDict = do char 'd'
            entries <- many dictEntry
@@ -53,5 +52,5 @@ bDict = do char 'd'
 -- This parser will parse a key-value pair
 dictEntry :: Parser (Bencode, Bencode)
 dictEntry = do key <- bString
-               value <- (bString <|> bList <|> bInt) -- TODO: Add bDict
+               value <- (bString <|> bList <|> bInt <|> bDict) -- TODO: Add bDict
                return (key, value)
