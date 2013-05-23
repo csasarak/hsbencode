@@ -3,16 +3,14 @@
 
 module Main where
 
-import Bencode
+import qualified Bencode as B
+import qualified Text.Parsec.ByteString as BS
 import System.Environment
 import System.IO
 
 -- This program will read a file and then print
 -- its Bencoded form
 main :: IO ()
-main = do args <- getArgs
-          withFile (head args) ReadMode parseBencode
-
---parseBencode :: Handle -> IO Bencode
-parseBencode = error "Not implemented"
-          
+main = do filename <- getArgs >>= (return . head)
+          bDict <- BS.parseFromFile B.bDict filename
+          putStr $ show bDict

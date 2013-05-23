@@ -7,14 +7,17 @@
 
 module Bencode where
 
-import Text.ParserCombinators.Parsec
+import Text.Parsec.ByteString
+import Text.Parsec.Char
+import Text.Parsec.Prim
+import Text.Parsec.Combinator
 import qualified Data.Map as M
 
 -- Technically this first argument can only be a Bstr, but I don't know
 -- how to express that
 type BMapT = M.Map Bencode Bencode
 
--- Maybe I should use a type variable?
+-- I have no idea why Bstr is okay as a String when it's a ByteString
 data Bencode =  Bint Integer
               | Bstr String
               | Blist [Bencode]
