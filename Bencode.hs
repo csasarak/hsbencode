@@ -28,9 +28,10 @@ data Bencode =  Bint Integer
 -- Parse a Bencoded Integer
 bInt :: Parser Bencode
 bInt = do char 'i'
+          neg <- option ' ' (char '-')
           ds <- many1 digit
           char 'e'
-          return $ Bint $ read ds 
+          return $ Bint $ read (neg:ds)
 
 -- Parse a Bencoded String
 bString :: Parser Bencode
