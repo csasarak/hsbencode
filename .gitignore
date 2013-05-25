@@ -1,1 +1,6 @@
 .*.swp\n
+*.hi
+*.o
+*.torrent
+*.swp
+
