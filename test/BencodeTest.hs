@@ -5,6 +5,7 @@ module Main where
 
 import qualified Bencode as B
 import qualified Text.Parsec.ByteString as BS
+import qualified Text.Parsec.Error as PE
 import System.Environment
 import System.IO
 
@@ -12,5 +13,10 @@ import System.IO
 -- its Bencoded form
 main :: IO ()
 main = do filename <- getArgs >>= (return . head)
-          bDict <- BS.parseFromFile B.bDict filename
+          bDict <- readTorrentFile filename
           putStr $ show bDict
+
+-- This function reads a torrent file. readTorrentFile "filename" reads
+-- that filename and returns the parsed bencoded dictionary
+readTorrentFile :: String -> IO (Either PE.ParseError B.Bencode)
+readTorrentFile filename = BS.parseFromFile B.bDict filename
