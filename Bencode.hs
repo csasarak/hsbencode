@@ -11,6 +11,7 @@ import Text.Parsec.ByteString
 import Text.Parsec.Char
 import Text.Parsec.Prim
 import Text.Parsec.Combinator
+import Data.Char
 import qualified Data.Map as M
 
 -- Technically this first argument can only be a Bstr, but I don't know
@@ -28,11 +29,21 @@ data Bencode =  Bint Integer
 -- Parse a Bencoded Integer
 bInt :: Parser Bencode
 bInt = do char 'i'
-          neg <- option ' ' (char '-')
-          ds <- many1 digit
+          num <- validNum
           char 'e'
-          return $ Bint $ read (neg:ds)
-
+          return $ Bint num
+       -- This parser parses valid integers in Bencodings 
+       where validNum = do neg <- option ' ' (char '-')
+                           d <- digit
+                           case digitToInt d of
+                                -- Only time the first digit == 0 is "i0e"
+                                0 -> if neg == ' ' then 
+                                        -- "i0e" allowed but NOT "i-0e" or zero padded integer
+                                        lookAhead (char 'e') >> return 0 
+                                     else
+                                        parserFail "Can't have a negative zero"
+                                _ -> (many digit) >>= \xs -> return $ read (neg:d:xs)
+       
 -- Parse a Bencoded String
 bString :: Parser Bencode
 bString = do ss <- many1 digit
