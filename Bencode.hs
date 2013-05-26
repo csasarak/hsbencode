@@ -23,8 +23,13 @@ data Bencode =  Bint Integer
               | Bstr String
               | Blist [Bencode]
               | Bmap BMapT
-              deriving (Show, Eq, Ord)
+              deriving (Eq, Ord)
 
+instance Show Bencode where
+    show (Bint i) = "i" ++ (show i) ++ "e"
+    show (Bstr s) = (show . length) s ++ ":" ++ s
+    show (Blist bs) = 'l':((concat . map show) bs) ++ "e"
+    show (Bmap bm) = (M.foldlWithKey (\a k b -> a ++ (show k) ++ (show b)) "d" bm)  ++ "e"
 
 -- Parse a Bencoded Integer
 bInt :: Parser Bencode
@@ -67,5 +72,6 @@ bDict = do char 'd'
 -- This parser will parse a key-value pair
 dictEntry :: Parser (Bencode, Bencode)
 dictEntry = do key <- bString
-               value <- (bString <|> bList <|> bInt <|> bDict) -- TODO: Add bDict
+               value <- (bString <|> bList <|> bInt <|> bDict)
                return (key, value)
+
