@@ -11,6 +11,7 @@ import Text.Parsec.ByteString
 import Text.Parsec.Char
 import Text.Parsec.Prim
 import Text.Parsec.Combinator
+import qualified Text.Parsec.Error as PE
 import Data.Char
 import qualified Data.Map as M
 
@@ -75,3 +76,7 @@ dictEntry = do key <- bString
                value <- (bString <|> bList <|> bInt <|> bDict)
                return (key, value)
 
+-- This function reads a torrent file. readBencodedFile "filename" reads
+-- that filename and returns the parsed bencoded dictionary
+readBencodedFile :: String -> IO (Either PE.ParseError Bencode)
+readBencodedFile filename = parseFromFile bDict filename
