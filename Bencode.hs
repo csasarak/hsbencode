@@ -79,4 +79,4 @@ dictEntry = do key <- bString
 -- This function reads a torrent file. readBencodedFile "filename" reads
 -- that filename and returns the parsed bencoded dictionary
 readBencodedFile :: String -> IO (Either PE.ParseError Bencode)
-readBencodedFile filename = parseFromFile bDict filename
+readBencodedFile = parseFromFile bDict
