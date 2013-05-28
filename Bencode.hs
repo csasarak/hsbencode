@@ -59,24 +59,24 @@ bString = do ss <- many1 digit
              
 bList :: Parser Bencode
 bList = do char 'l' 
-           ls <- many (bInt <|> bString <|> bList <|> bDict)
+           ls <- many (bInt <|> bString <|> bList <|> bMap)
            char 'e'
            return $ Blist ls
  
 -- A parser which parses dictionaries 
-bDict :: Parser Bencode
-bDict = do char 'd'
-           entries <- many dictEntry
-           char 'e'
-           return $ Bmap $ M.fromList entries
+bMap :: Parser Bencode
+bMap = do char 'd'
+          entries <- many dictEntry
+          char 'e'
+          return $ Bmap $ M.fromList entries
 
 -- This parser will parse a key-value pair
 dictEntry :: Parser (Bencode, Bencode)
 dictEntry = do key <- bString
-               value <- (bString <|> bList <|> bInt <|> bDict)
+               value <- (bString <|> bList <|> bInt <|> bMap)
                return (key, value)
 
 -- This function reads a torrent file. readBencodedFile "filename" reads
 -- that filename and returns the parsed bencoded dictionary
 readBencodedFile :: String -> IO (Either PE.ParseError Bencode)
-readBencodedFile filename = parseFromFile bDict filename
+readBencodedFile = parseFromFile bMap
