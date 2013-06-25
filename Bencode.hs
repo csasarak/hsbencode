@@ -55,7 +55,7 @@ bString :: Parser Bencode
 bString = do ss <- many1 digit
              char ':'
              let size = read ss
-             (count size $ anyChar) >>= \x -> return (Bstr x)
+             (count size $ anyChar) >>=  return . Bstr
              
 bList :: Parser Bencode
 bList = do char 'l' 
