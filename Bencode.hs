@@ -1,5 +1,5 @@
 -- Author: Christopher Sasarak
--- Filename: bencode.hs
+-- Filename: Bencode.hs
 
 
 -- This is an implementation of Bencoding for bittorrent as described at 
@@ -63,7 +63,7 @@ bList = do char 'l'
            char 'e'
            return $ Blist ls
  
--- A parser which parses dictionaries 
+-- A parser which parses bencoded dictionaries 
 bMap :: Parser Bencode
 bMap = do char 'd'
           entries <- many dictEntry
