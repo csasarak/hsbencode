@@ -14,6 +14,7 @@ import Text.Parsec.Combinator
 import qualified Text.Parsec.Error as PE
 import Data.Char
 import qualified Data.Map as M
+import qualified Control.Monad as Mon
 
 -- Technically this first argument can only be a Bstr, but I don't know
 -- how to express that
@@ -27,10 +28,10 @@ data Bencode =  Bint Integer
               deriving (Eq, Ord)
 
 instance Show Bencode where
-    show (Bint i) = "i" ++ (show i) ++ "e"
+    show (Bint i) = "i" ++ show i ++ "e"
     show (Bstr s) = (show . length) s ++ ":" ++ s
-    show (Blist bs) = 'l':((concat . map show) bs) ++ "e"
-    show (Bmap bm) = (M.foldlWithKey (\a k b -> a ++ (show k) ++ (show b)) "d" bm)  ++ "e"
+    show (Blist bs) = 'l':concatMap show bs ++ "e"
+    show (Bmap bm) = M.foldlWithKey (\a k b -> a ++ show k ++ show b) "d" bm  ++ "e"
 
 -- Parse a Bencoded Integer
 bInt :: Parser Bencode
@@ -48,14 +49,14 @@ bInt = do char 'i'
                                         lookAhead (char 'e') >> return 0 
                                      else
                                         parserFail "Can't have a negative zero"
-                                _ -> (many digit) >>= \xs -> return $ read (neg:d:xs)
+                                _ -> many digit >>= \xs -> return $ read (neg:d:xs)
        
 -- Parse a Bencoded String
 bString :: Parser Bencode
 bString = do ss <- many1 digit
              char ':'
              let size = read ss
-             (count size $ anyChar) >>=  return . Bstr
+             Mon.liftM Bstr $ count size anyChar
              
 bList :: Parser Bencode
 bList = do char 'l' 
@@ -73,7 +74,7 @@ bMap = do char 'd'
 -- This parser will parse a key-value pair
 dictEntry :: Parser (Bencode, Bencode)
 dictEntry = do key <- bString
-               value <- (bString <|> bList <|> bInt <|> bMap)
+               value <- bString <|> bList <|> bInt <|> bMap
                return (key, value)
 
 -- This function reads a torrent file. readBencodedFile "filename" reads
