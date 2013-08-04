@@ -37,13 +37,13 @@ sendTrackerGET s = do Right m <- B.readBencodedFile s
 -- produce a URL suitable for use in a tracker GET request
 genTrackerURL :: Word32 -> B.Bencode -> String
 genTrackerURL ip (B.Bmap m) = tAddr ++  "?" ++ (DL.intercalate "," .  map (\(x, y) ->  x ++ "=" ++ y)) urlKeyVals
-               where info_hash = infoHash $ m Map.! (B.Bstr "info")
-                     B.Bstr tAddr = m Map.! (B.Bstr "announce")
+               where info_hash = infoHash $ m Map.! B.Bstr "info"
+                     B.Bstr tAddr = m Map.! B.Bstr "announce"
                      port = 0 -- TODO
                      uploaded = 0
                      downloaded = 0
                      left = 0
-                     urlKeyVals = [ ("info_hash", (show info_hash)), ("ip", show ip),
+                     urlKeyVals = [ ("info_hash", show info_hash), ("ip", show ip),
                         ("uploaded", show uploaded), ("downloaded", show downloaded),
                         ("left", show left)]
 
