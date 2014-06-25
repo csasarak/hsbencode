@@ -19,5 +19,5 @@ library
   exposed-modules:     Bencode, BencodeTest
   -- other-modules:       
   build-depends:       base ==4.6.*, parsec ==3.1.*, containers ==0.5.*
-  hs-source-dirs: ., test
+  hs-source-dirs: .
 

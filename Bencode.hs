@@ -1,13 +1,11 @@
 {-|
-  Module      : W
-  Description : Short description
+  Module      : Bencode 
+  Description : Implementation of Bencoding for bittorrent as described at http://www.bittorrent.org/beps/bep_0003.html
   Copyright   : (c) Christopher Sasarak, 2014
   License     : GPL-3
   Maintainer  : cms5347@rit.edu
   Stability   : experimental
   
-  This is an implementation of Bencoding for bittorrent as described at 
-  http://www.bittorrent.org/beps/bep_0003.html
  -}
 
 module Bencode where
