@@ -1,7 +1,7 @@
 -- Author: Christopher Sasarak
 -- Filename: BencodeTest.hs
 
-module Main where
+module BencodeTest where
 
 import qualified Bencode as B
 import qualified Text.Parsec.ByteString as BS

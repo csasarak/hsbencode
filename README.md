@@ -1,4 +1,4 @@
-hstorrent
+hsbencode
 =========
 
-A bittorrent implementation in Haskell
+A Bencoded dictionary parser for Haskell.
