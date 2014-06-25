@@ -1,9 +1,14 @@
--- Author: Christopher Sasarak
--- Filename: Bencode.hs
-
-
--- This is an implementation of Bencoding for bittorrent as described at 
--- http://www.bittorrent.org/beps/bep_0003.html
+{-|
+  Module      : W
+  Description : Short description
+  Copyright   : (c) Christopher Sasarak, 2014
+  License     : GPL-3
+  Maintainer  : cms5347@rit.edu
+  Stability   : experimental
+  
+  This is an implementation of Bencoding for bittorrent as described at 
+  http://www.bittorrent.org/beps/bep_0003.html
+ -}
 
 module Bencode where
 
@@ -16,14 +21,16 @@ import Data.Char
 import qualified Data.Map as M
 import qualified Control.Monad as Mon
 
--- Technically this first argument can only be a Bstr, but I don't know
--- how to express that
+-- | A map from Bencode data to Bencode data
 type BMapT = M.Map Bencode Bencode
 
--- I have no idea why Bstr is okay as a String when it's a ByteString
-data Bencode =  Bint Integer
+data Bencode =  -- |Constructor for a Bencoded Integer
+                Bint Integer
+                -- |Constructor for a Bencoded String
               | Bstr String
+                -- |Constructor for a list of Bencoded items
               | Blist [Bencode]
+                -- |Constructor for a Bencoded Map (dictionary)
               | Bmap BMapT
               deriving (Eq, Ord)
 
@@ -33,7 +40,7 @@ instance Show Bencode where
     show (Blist bs) = 'l':concatMap show bs ++ "e"
     show (Bmap bm) = M.foldlWithKey (\a k b -> a ++ show k ++ show b) "d" bm  ++ "e"
 
--- Parse a Bencoded Integer
+-- |Parser for a Bencoded Integer
 bInt :: Parser Bencode
 bInt = do char 'i'
           num <- validNum
@@ -51,33 +58,33 @@ bInt = do char 'i'
                                         parserFail "Can't have a negative zero"
                                 _ -> many digit >>= \xs -> return $ read (neg:d:xs)
        
--- Parse a Bencoded String
+-- |Parser for a Bencoded String
 bString :: Parser Bencode
 bString = do ss <- many1 digit
              char ':'
              let size = read ss
              Mon.liftM Bstr $ count size anyChar
              
+-- |Parser for a Bencoded list
 bList :: Parser Bencode
 bList = do char 'l' 
            ls <- many (bInt <|> bString <|> bList <|> bMap)
            char 'e'
            return $ Blist ls
  
--- A parser which parses bencoded dictionaries 
+-- |Parser for a Bencoded dictionary
 bMap :: Parser Bencode
 bMap = do char 'd'
           entries <- many dictEntry
           char 'e'
           return $ Bmap $ M.fromList entries
 
--- This parser will parse a key-value pair
+-- |Parser for a key-value pair
 dictEntry :: Parser (Bencode, Bencode)
 dictEntry = do key <- bString
                value <- bString <|> bList <|> bInt <|> bMap
                return (key, value)
 
--- This function reads a torrent file. readBencodedFile "filename" reads
--- that filename and returns the parsed bencoded dictionary
+-- |Read a Bencoded dictionary from filename
 readBencodedFile :: String -> IO (Either PE.ParseError Bencode)
 readBencodedFile = parseFromFile bMap
