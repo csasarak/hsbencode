@@ -10,14 +10,15 @@
 
 module Bencode where
 
-import Text.Parsec.ByteString
 import Text.Parsec.Char
 import Text.Parsec.Prim
+import Text.ParserCombinators.Parsec.Prim
 import Text.Parsec.Combinator
 import qualified Text.Parsec.Error as PE
 import Data.Char
 import qualified Data.Map as M
 import qualified Control.Monad as Mon
+import qualified Control.Applicative as CA
 
 -- | A map from Bencode data to Bencode data
 type BMapT = M.Map Bencode Bencode
@@ -40,10 +41,7 @@ instance Show Bencode where
 
 -- |Parser for a Bencoded Integer
 bInt :: Parser Bencode
-bInt = do char 'i'
-          num <- validNum
-          char 'e'
-          return $ Bint num
+bInt = Bint CA.<$> (char 'i' CA.*> validNum CA.<* char 'e' )
        -- This parser parses valid integers in Bencodings 
        where validNum = do neg <- option ' ' (char '-')
                            d <- digit
